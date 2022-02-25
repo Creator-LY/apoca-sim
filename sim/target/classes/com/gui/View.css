@@ -1,0 +1,64 @@
+
+.root {
+    -fx-background-color: #26262b;
+}
+#title {
+    -fx-text-fill: white;
+    -fx-text-weight: bold;
+    -fx-font-size: 1.2em;
+    -fx-font-family: 'Helvetica', Arial, sans-serif;
+}
+#topBar {
+    -fx-background-color: #393940;
+}
+.topBar-button {
+    -fx-background-color: transparent;
+}
+.topBar-button:hover {
+    -fx-background-color: #171717;
+  
+}
+#vpanel {
+    -fx-background-color: #2c2c30;
+    -fx-border-color: #4169e1;
+    -fx-border-width: 0 3 0 0;
+}
+#status-pane {
+    -fx-background-color: #303036;
+    -fx-border-color: #4169e1;
+    -fx-border-width: 0 0 3 0;
+}
+.status-label {
+    -fx-text-fill: white;
+    -fx-padding: 3 0 0 20;
+}
+.border-bottom {
+    -fx-border-color: #4169e1;
+    -fx-border-width: 0 0 3 0;
+}
+.command-button {
+    -fx-background-color: #393940;
+}
+.command-button:hover {
+    -fx-background-color: #171717;
+}
+#slider-label {
+    -fx-text-fill: white;
+}
+#slider {
+    -fx-max-width: 165px;
+}
+#slider .track {
+    -fx-background-color: linear-gradient(to left, rgb(214, 65, 65), rgb(109, 190, 218));
+}
+#slider .thumb {
+    -fx-pref-width: 6px;
+    -fx-pref-height: 12px;
+    -fx-background-color: white;
+    -fx-border-color: black;
+    -fx-border-radius: 3px;
+}
+#slider .axis {
+    -fx-tick-label-fill: white;
+}
+
