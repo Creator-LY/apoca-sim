@@ -54,6 +54,7 @@ public class MainView {
     private VBox vPanel;
     private Movement clk;
     private Simulation sim;
+    private boolean stepComplete;
     
     public MainView(Image icon, EventHandler<ActionEvent> minimise, EventHandler<ActionEvent> exit) {
         clk = new Movement();
@@ -156,6 +157,7 @@ public class MainView {
                 gc.setFill(Color.CORNSILK);
                 gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                 sim = new Simulation(world, 100);
+                stepComplete = true;
             }
         };
 
@@ -176,10 +178,13 @@ public class MainView {
         EventHandler<ActionEvent> stepEvent = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e)
             {
-                gc.setFill(Color.CORNSILK);
-                gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-                sim.action();
-                sim.draw();
+                if (stepComplete) {
+                    System.out.println("step");
+                    gc.setFill(Color.CORNSILK);
+                    gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                    sim.action();
+                    stepComplete = sim.draw();
+                }
             }
         };
 
@@ -205,12 +210,14 @@ public class MainView {
     
         @Override
         public void handle(long now) {
-            if (now - last > INTERVAL) {
+            if (now - last > INTERVAL && stepComplete) {
                 try {
+                    //System.out.println("called");
                     gc.setFill(Color.CORNSILK);
                     gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                    stepComplete = false;
                     sim.action();
-                    sim.draw();
+                    stepComplete = sim.draw();
                     last = now; 
                 } catch (Exception e) {
                     System.out.println(e);

@@ -1,28 +1,47 @@
 package com.model;
 
-public class Human extends Specie {
-    private String gender = selectGender();
+public class Mob extends Specie {
+    private int spotRadius = 45;
+    private SpecieTypes huntedType;
+    private int huntedIndex;
+    private double perferAngle = Math.random() * 2 * Math.PI;
     private boolean birth = false;
     private int birthPeriod = 0;
     private int starveCount = 0;  //168 actions = 7 days
-    private int energy = 100;
-    private int spotRadius = 30;
-    
-    public Human(double x, double y, double worldWidth, double worldHeight, int diameter) {
+    private int energy = 200;
+
+    public Mob(double x, double y, double worldWidth, double worldHeight, int diameter) {
         super(x, y, worldWidth, worldHeight, diameter);
+        setSpeed(2.4f);
     }
 
-    public Human(double worldWidth, double worldHeight, int diameter) {
+    public Mob(double worldWidth, double worldHeight, int diameter) {
         super(worldWidth, worldHeight, diameter);
+        setSpeed(2.4f);
     }
 
-    public String selectGender() {
-        if(Math.random() > 0.5) {return "Male"; }
-        else { return "Female"; }
+    public int getSpotRadius() {
+        return spotRadius;
     }
 
-    public String getGender() {
-        return gender;
+    public SpecieTypes getHuntedType() {
+        return huntedType;
+    }
+
+    public int getHuntedIndex() {
+        return huntedIndex;
+    }
+
+    public void setHuntedType(SpecieTypes huntedType) {
+        this.huntedType = huntedType;
+    }
+
+    public void setHuntedIndex(int huntedIndex) {
+        this.huntedIndex = huntedIndex;
+    }
+
+    public double getPerferAngle() {
+        return perferAngle;
     }
 
     public boolean getBirth() {
@@ -42,13 +61,9 @@ public class Human extends Specie {
     }
 
     public boolean giveBirth() {
-        return birthPeriod >= 100;
+        return birthPeriod >= 200;
     }
 
-    public int getSpotRadius() {
-        return spotRadius;
-    }
-    
     public void inEnergy(int amount) {
         if (starveCount == 0) {
             energy += 72*amount;
@@ -70,7 +85,7 @@ public class Human extends Specie {
         if (energy == 0) {
             starveCount ++;
         }
-        if (starveCount > 168) {
+        if (starveCount > 200) {
             return true;
         } else {
             return false;
@@ -87,10 +102,11 @@ public class Human extends Specie {
 
     public void setDefault(double x, double y) {
         super.setinit(x, y);
-        gender = selectGender();
+        huntedType = null;
         birth = false;
         birthPeriod = 0;
         starveCount = 0;
-        energy = 100;
+        energy = 250;
+        perferAngle = Math.random() * 2 * Math.PI;
     }
 }

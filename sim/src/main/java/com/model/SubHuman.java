@@ -1,48 +1,16 @@
 package com.model;
 
-public class Human extends Specie {
-    private String gender = selectGender();
-    private boolean birth = false;
-    private int birthPeriod = 0;
+public class SubHuman extends Specie {
     private int starveCount = 0;  //168 actions = 7 days
     private int energy = 100;
-    private int spotRadius = 30;
-    
-    public Human(double x, double y, double worldWidth, double worldHeight, int diameter) {
+    private int spotRadius = 35;
+
+    public SubHuman(double x, double y, double worldWidth, double worldHeight, int diameter) {
         super(x, y, worldWidth, worldHeight, diameter);
     }
 
-    public Human(double worldWidth, double worldHeight, int diameter) {
+    public SubHuman(double worldWidth, double worldHeight, int diameter) {
         super(worldWidth, worldHeight, diameter);
-    }
-
-    public String selectGender() {
-        if(Math.random() > 0.5) {return "Male"; }
-        else { return "Female"; }
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public boolean getBirth() {
-        return birth;
-    }
-
-    public void setBirth(boolean birth) {
-        this.birth = birth;
-    }
-
-    public void incrementBirthPeriod() {
-        birthPeriod++;
-    }
-
-    public void resetBirthPeriod() {
-        birthPeriod = 0;
-    }
-
-    public boolean giveBirth() {
-        return birthPeriod >= 100;
     }
 
     public int getSpotRadius() {
@@ -59,7 +27,7 @@ public class Human extends Specie {
     }
 
     public void deEnergy() {
-        energy--;
+        energy-=2;
     }
 
     public int getStarveCount() {
@@ -87,9 +55,6 @@ public class Human extends Specie {
 
     public void setDefault(double x, double y) {
         super.setinit(x, y);
-        gender = selectGender();
-        birth = false;
-        birthPeriod = 0;
         starveCount = 0;
         energy = 100;
     }

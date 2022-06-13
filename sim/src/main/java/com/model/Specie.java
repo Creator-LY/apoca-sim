@@ -1,38 +1,25 @@
 package com.model;
 
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-
-public class Specie {
-    public int diameter = 10;
-
-    private Position pos;
+public abstract class Specie extends Entity {
     private double dx;
     private double dy;
-    private Canvas world;
-    private GraphicsContext gc;
+    private boolean direct = false;
+    private float speed = 1.8f;
 
-    public Specie(double x, double y, Canvas world) {
-        pos = new Position(x, y);
-
-        this.world = world;
-        gc = world.getGraphicsContext2D();
+    public Specie(double x, double y, double worldWidth, double worldHeight, int diameter) {
+        super(x, y, worldWidth, worldHeight, diameter);
     }
 
-    public Specie(Canvas world) {
-        pos = new Position(world, diameter);
-
-        this.world = world;
-        gc = world.getGraphicsContext2D();
+    public Specie(double worldWidth, double worldHeight, int diameter) {
+        super(worldWidth, worldHeight, diameter);
     }
 
-    public Position getPos() {
-        return pos;
+    public float getSpeed() {
+        return speed;
     }
 
-    public int getDiameter() {
-        return diameter;
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 
     public void setDx(double dx) {
@@ -43,13 +30,34 @@ public class Specie {
         this.dy = dy;
     }
 
-    public void move() {
-        pos.move(dx, dy, world, diameter);
+    public double getDx() {
+        return dx;
     }
 
-    public void draw(Color color) {
-        gc.setFill(color);
-        gc.strokeOval(pos.getX(), pos.getY(), diameter, diameter);
-        gc.fillOval(pos.getX(), pos.getY(), diameter, diameter);
+    public double getDy() {
+        return dy;
+    }
+
+    public void setVelocity(double angle) {
+        setDx(Math.cos(angle) * speed);
+        setDy(Math.sin(angle) * speed);
+    }
+
+    public boolean getDirect() {
+        return direct;
+    }
+
+    public void setDirect(boolean direct) {
+        this.direct = direct;
+    }
+
+    public void move() {
+        getPos().move(dx, dy);
+    }
+
+    public void setinit(double x, double y) {
+        setRemoved(false);
+        getPos().setXY(x, y);
+        direct = false;
     }
 }
