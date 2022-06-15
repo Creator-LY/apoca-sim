@@ -3,6 +3,7 @@ package com.model;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Random;
 
 import javafx.util.Pair;
 
@@ -22,7 +23,10 @@ public class Simulation {
     private int subhumanCount;
     private int mobCount;
     private int plantCount;
+    private int corpseCount;
     private boolean isDay;
+    private boolean isRain;
+    private boolean isLightning;
     private EnumMap<SpecieTypes, Integer> SpeciesToDiameter;
     private int removeHumanCount;
     private int removeZombieCount;
@@ -39,17 +43,18 @@ public class Simulation {
     private ArrayList<Plant> plants;
     private ArrayList<Corpse> corpses;
 
-    public Simulation(Canvas world, int population) {
-        resourceCount = 0;
-        humanCount = 0;
-        zombieCount = 0;
-        subhumanCount = 0;
-        mobCount = 20;
-        plantCount = 20;
+    public Simulation(Canvas world, int resourceAmount, int humanAmount, int zombieAmount, int subhumanAmount, int mobAmount, int plantAmount) {
+        resourceCount = resourceAmount;
+        humanCount = humanAmount;
+        zombieCount = zombieAmount;
+        subhumanCount = subhumanAmount;
+        mobCount = mobAmount;
+        plantCount = plantAmount;
 
-        drawer = new Drawer(world);
         worldWidth = world.getWidth();
         worldHeight = world.getHeight();
+        drawer = new Drawer(world, worldWidth, worldHeight);
+        
 
         SpeciesToDiameter = new EnumMap<>(SpecieTypes.class);
         SpeciesToDiameter.put(SpecieTypes.Resource, 7);
@@ -57,13 +62,13 @@ public class Simulation {
 
         drawer.setDiameterMap(SpeciesToDiameter);
         
-        resources = new ArrayList<Resource>(1);
-        humans = new ArrayList<Human>(population);
-        zombies = new ArrayList<Zombie>(20);
-        subhumans = new ArrayList<SubHuman>();
-        corpses = new ArrayList<Corpse>(Math.floorDiv(population, 4));
-        mobs = new ArrayList<Mob>();
-        plants = new ArrayList<Plant>();
+        resources = new ArrayList<Resource>(resourceAmount);
+        humans = new ArrayList<Human>(humanAmount);
+        zombies = new ArrayList<Zombie>(zombieAmount);
+        subhumans = new ArrayList<SubHuman>(20);
+        corpses = new ArrayList<Corpse>(humanAmount);
+        mobs = new ArrayList<Mob>(mobAmount*2);
+        plants = new ArrayList<Plant>(plantAmount);
 
         for (int i = 0; i < resourceCount; i++) {
             resources.add(new Resource(worldWidth, worldHeight, SpeciesToDiameter.get(SpecieTypes.Resource)));
@@ -90,6 +95,7 @@ public class Simulation {
         }
 
         draw();
+        amountStatus();
     }
 
     public void generateQuadTree() {
@@ -108,6 +114,11 @@ public class Simulation {
         for (int i = 0; i < zombies.size(); i++) {
             if (!zombies.get(i).getRemoved()) {
                 qt.insert(zombies.get(i).getX(), zombies.get(i).getY(), new Pair<SpecieTypes,Integer>(SpecieTypes.Zombie, i));
+            }
+        }
+        for (int i = 0; i < subhumans.size(); i++) {
+            if (!subhumans.get(i).getRemoved()) {
+                qt.insert(subhumans.get(i).getX(), subhumans.get(i).getY(), new Pair<SpecieTypes,Integer>(SpecieTypes.SubHuman, i));
             }
         }
         for (int i = 0; i < mobs.size(); i++) {
@@ -214,7 +225,7 @@ public class Simulation {
                 return Math.atan2(plants.get(index).getY()-pos.getY()+(SpecieDiameter / 2),
                 plants.get(index).getX()-pos.getX()+(SpecieDiameter / 2));
                 default:
-                    return 0;
+                return 0;
             }
         }
     }
@@ -334,7 +345,7 @@ public class Simulation {
                     int diameter = SpeciesToDiameter.get((SpecieTypes.Resource));
                     resource.getPos().setXY(Math.random() * (worldWidth - diameter), Math.random() * (worldWidth - diameter));
                     resource.setRemoved(false);
-                    removePlantCount--;
+                    removeResourceCount--;
                     flag = true;
                     break;
                 }
@@ -345,18 +356,121 @@ public class Simulation {
         }
     }
 
+    public void replaceResources(double x, double y) {
+        boolean flag = false;
+        if (removeResourceCount > 0) {
+            for (Resource resource : resources) {
+                if (resource.getRemoved()) {
+                    resource.getPos().setXY(x, y);
+                    resource.setRemoved(false);
+                    removeResourceCount--;
+                    flag = true;
+                    break;
+                }
+            }
+        }
+        if (!flag) {
+            resources.add(new Resource(x, y, worldWidth, worldHeight, SpeciesToDiameter.get(SpecieTypes.Resource)));
+        }
+    }
+
     public void action() {
         steps++;
         timeStatus();
+        
+        if (steps % 24 == 0) {
+            if (Math.random() < 0.3) {
+                isRain = true;
+            } else {
+                isRain = false;
+            }
+        }
+        if (!isLightning && steps > 24) {
+            if (Math.floorDiv(steps, 24) % 20 == 0 && Math.random() < 0.4) {
+                isLightning = true;
+            }
+        } else {
+            if (steps % 24 == 0) {
+                isLightning = false;
+            }
+        }
+        
+        dayWeather();
+
+        amountStatus();
         generateQuadTree();
         int resourceDiameter = SpeciesToDiameter.get(SpecieTypes.Resource);
         int SpecieDiameter = SpeciesToDiameter.get(SpecieTypes.Specie);
 
         /*******************************************
+        Lightning Effects
+        ********************************************/
+        if (isLightning && steps % 24 <= 20 && steps % 48 == 0) {
+            int chance = new Random().nextInt(6);
+            int pick;
+            switch (chance) {
+                case 0:
+                if (humans.size() != 0) {
+                    pick = new Random().nextInt(humans.size());
+                    if (!humans.get(pick).getRemoved()) {
+                        humans.get(pick).setRemoved(true);
+                        removeHumanCount++;
+                    }
+                }
+                break;
+                case 1:
+                if (zombies.size() != 0) {
+                    pick = new Random().nextInt(zombies.size());
+                    if (!zombies.get(pick).getRemoved()) {
+                        zombies.get(pick).setRemoved(true);
+                        removeZombieCount++;
+                    }
+                }
+                break;
+                case 2:
+                if (subhumans.size() != 0) {
+                    pick = new Random().nextInt(subhumans.size());
+                    if (!subhumans.get(pick).getRemoved()) {
+                        subhumans.get(pick).setRemoved(true);
+                        removeSubHumanCount++;
+                    }
+                }
+                break;
+                case 3:
+                if (mobs.size() != 0) {
+                    pick = new Random().nextInt(mobs.size());
+                    if (!mobs.get(pick).getRemoved()) {
+                        mobs.get(pick).setRemoved(true);
+                        removeMobCount++;
+                    }
+                }
+                break;
+                case 4:
+                if (plants.size() != 0) {
+                    pick = new Random().nextInt(plants.size());
+                    if (!plants.get(pick).getRemoved()) {
+                        plants.get(pick).setRemoved(true);
+                        removePlantCount++;
+                    }
+                }
+                break;
+                case 5:
+                if (corpses.size() != 0) {
+                    pick = new Random().nextInt(corpses.size());
+                    if (!corpses.get(pick).getRemoved()) {
+                        corpses.get(pick).setRemoved(true);
+                        removeCorpseCount++;
+                    }
+                }
+                break;
+            }
+        }
+
+        /*******************************************
         Add more resources
         ********************************************/
-        if (steps % 168 == 0) {
-            for (int i = 0; i < Math.floorDiv(humans.size(), 2); i++) {
+        if (steps % 96 == 0) {
+            for (int i = 0; i < Math.floorDiv(humanCount, 2)+subhumanCount; i++) {
                 replaceResources();
             }
         }
@@ -384,6 +498,19 @@ public class Simulation {
                     } 
                 }
                 /*******************************************
+                Plant with weather effect
+                ********************************************/
+                if (isLightning && !isRain && Math.random() > 0.5) {
+                    plants.get(i).setOnFire(true);
+                }
+                if (isRain && plants.get(i).getOnFire()) {
+                    plants.get(i).setOnFire(false);
+                }
+                if (plants.get(i).getOnFire() && steps % 24 > 23 && Math.random() < 0.4) {
+                    plants.get(i).setRemoved(true);
+                    removePlantCount++;
+                }
+                /*******************************************
                 Plant collsion
                 ********************************************/
                 /*******************************************
@@ -406,6 +533,7 @@ public class Simulation {
                         break;
                         case Mob:
                         collidePrey.remove(j);
+                        break;
                         case Plant:
                         collidePrey.remove(j);
                         break;
@@ -650,16 +778,27 @@ public class Simulation {
                 Resource finding for sub-human
                 ********************************************/
                 if (!subhumans.get(i).getDirect()) {
+                    double angle;
                     List<Pair<SpecieTypes, Integer>> findResources = collisionDetect(subhumans.get(i).getPos(), subhumans.get(i).getSpotRadius(), SpecieTypes.Resource);
                     for (int j = findResources.size()-1; j >= 0; j--) {
                         if (resources.get(findResources.get(j).getValue()).getRemoved()) {
                             findResources.remove(j);
                         }
                     }
-
-                    double angle = indexToAngle(pickNearest(findResources, subhumans.get(i).getPos()), subhumans.get(i).getPos());
+                    if (findResources.size() != 0) {
+                        angle = indexToAngle(pickNearest(findResources, subhumans.get(i).getPos()), subhumans.get(i).getPos());
+                    } else {
+                        List<Pair<SpecieTypes, Integer>> findCorpses = collisionDetect(subhumans.get(i).getPos(), subhumans.get(i).getSpotRadius(), SpecieTypes.Corpse);
+                        for (int j = findCorpses.size()-1; j >= 0; j--) {
+                            if (corpses.get(findCorpses.get(j).getValue()).getRemoved() || corpses.get(findCorpses.get(j).getValue()).getIsMutated()) {
+                                findCorpses.remove(j);
+                            }
+                        }
+                        angle = indexToAngle(pickNearest(findCorpses, subhumans.get(i).getPos()), subhumans.get(i).getPos());
+                    }
                     subhumans.get(i).setVelocity(angle);
                     subhumans.get(i).setDirect(true);
+                    
 
                     //Debugging range finding
                     // int range = subhumans.get(i).getSpotRadius();
@@ -734,6 +873,7 @@ public class Simulation {
                     }
                     if (collideCorpse.size() > 0) {
                         subhumans.get(i).inEnergy(collideCorpse.size());
+                        subhumans.get(i).setDirect(false);
                         for (Pair<SpecieTypes,Integer> pair : collideCorpse) {
                             corpses.get(pair.getValue()).setRemoved(true);
                             removeCorpseCount++;
@@ -787,7 +927,7 @@ public class Simulation {
                         zombies.get(i).setHuntedIndex(typeIndex.getValue());
                         zombies.get(i).setDirect(true);
                     } else {
-                        mobs.get(i).setHuntedType(SpecieTypes.Specie);
+                        zombies.get(i).setHuntedType(SpecieTypes.Specie);
                     }
                 }
                 if (zombies.get(i).getHuntedType() != SpecieTypes.Specie && !humans.get(zombies.get(i).getHuntedIndex()).getRemoved()) {
@@ -807,9 +947,15 @@ public class Simulation {
                     }
                 }
                 for (Pair<SpecieTypes,Integer> pair : collidePrey) {
-                    humans.get(pair.getValue()).setRemoved(true);
-                    removeHumanCount++;
-                    replaceZombie(humans.get(pair.getValue()).getX(), humans.get(pair.getValue()).getY());
+                    if (Math.random() > 0.4) {
+                        humans.get(pair.getValue()).setRemoved(true);
+                        removeHumanCount++;
+                        replaceZombie(humans.get(pair.getValue()).getX(), humans.get(pair.getValue()).getY());
+                    } else {
+                        zombies.get(i).setRemoved(true);
+                        removeZombieCount++;
+                        replaceCorpse(zombies.get(i).getX(), zombies.get(i).getY(), true);
+                    }
                 }
             }
         }
@@ -869,7 +1015,7 @@ public class Simulation {
                         resources.get(pair.getValue()).setRemoved(true);
                         removeResourceCount++;
                     }
-                } else if (humans.get(i).getStarveCount() > 0) {
+                } else if (humans.get(i).getEnergy() < 10) {
                     List<Pair<SpecieTypes, Integer>> collideCorpse = collisionDetect(humans.get(i).getPos(), SpecieDiameter, SpecieTypes.Corpse);
                     for (int j = collideCorpse.size()-1; j >= 0; j--) {
                         if (corpses.get(collideCorpse.get(j).getValue()).getRemoved()) {
@@ -878,7 +1024,9 @@ public class Simulation {
                     }
                     if (collideCorpse.size() > 0) {
                        humans.get(i).setRemoved(true);
+                       removeHumanCount++;
                        corpses.get(collideCorpse.get(0).getValue()).setRemoved(true);
+                       removeCorpseCount++;
                        replaceSubHuman(humans.get(i).getX(), humans.get(i).getY());
                     }
                 }
@@ -923,6 +1071,92 @@ public class Simulation {
         }
     }
 
+    public void editWorld(int mode, double x, double y) {
+        switch (mode) {
+            case -1:
+            generateQuadTree();
+            //drawer.drawRect(x-7, y-7, 14, 14);
+            List<Pair<SpecieTypes, Integer>> findInArea = rangeSearch(x-7, x+7, y-7, y+7, SpecieTypes.Specie);
+            for (Pair<SpecieTypes, Integer> pair : findInArea) {
+                switch (pair.getKey()) {
+                    case Resource:
+                    if (!resources.get(pair.getValue()).getRemoved()) {
+                        resources.get(pair.getValue()).setRemoved(true);
+                        removeResourceCount++;
+                    }
+                    break;
+                    case Corpse:
+                    if (!corpses.get(pair.getValue()).getRemoved()) {
+                        corpses.get(pair.getValue()).setRemoved(true);
+                        removeCorpseCount++;
+                    }
+                    break;
+                    case Human:
+                    if (!humans.get(pair.getValue()).getRemoved()) {
+                        humans.get(pair.getValue()).setRemoved(true);
+                        removeHumanCount++;
+                    }
+                    break;
+                    case SubHuman:
+                    if (!subhumans.get(pair.getValue()).getRemoved()) {
+                        subhumans.get(pair.getValue()).setRemoved(true);
+                        removeSubHumanCount++;
+                    }
+                    break;
+                    case Zombie:
+                    if (!zombies.get(pair.getValue()).getRemoved()) {
+                        zombies.get(pair.getValue()).setRemoved(true);
+                        removeZombieCount++;
+                    }
+                    break;
+                    case Mob:
+                    if (!mobs.get(pair.getValue()).getRemoved()) {
+                        mobs.get(pair.getValue()).setRemoved(true);
+                        removeMobCount++;
+                    }
+                    break;
+                    case Plant:
+                    if (!plants.get(pair.getValue()).getRemoved()) {
+                        plants.get(pair.getValue()).setRemoved(true);
+                        removePlantCount++;
+                    }
+                    break;
+                    default:
+                    break;
+                }
+            }
+            break;
+            case 0:
+            replaceResources(x, y);
+            break;
+            case 1:
+            replaceHuman(x, y);
+            break;
+            case 2:
+            replaceZombie(x, y);
+            break;
+            case 3:
+            replaceSubHuman(x, y);
+            break;
+            case 4:
+            replaceMob(x, y);
+            break;
+            case 5:
+            replacePlant(x, y);
+            break;
+            default:
+            break;
+        }
+        draw();
+        amountStatus();
+    }
+
+    public void editWorld(int mode, double x, double y, boolean isMutated) {
+        replaceCorpse(x, y, isMutated);
+        draw();
+        amountStatus();
+    }
+
     public boolean draw() {
         drawer.drawStep(resources, humans, zombies, subhumans, corpses, mobs, plants);
         return true;
@@ -936,5 +1170,22 @@ public class Simulation {
         }
         String time = String.format("Time: %02d:00", steps%24);
         MainView.setTime("Steps: " + steps, time, "Days: " + Math.floorDiv(steps, 24));
+    }
+
+    public void amountStatus() {
+        resourceCount = resources.size()-removeResourceCount;
+        humanCount = humans.size()-removeHumanCount;
+        zombieCount = zombies.size()-removeZombieCount;
+        subhumanCount = subhumans.size()-removeSubHumanCount;
+        mobCount = mobs.size()-removeMobCount;
+        plantCount = plants.size()-removePlantCount;
+        corpseCount = corpses.size()-removeCorpseCount;
+        String [] amountArr = {"Resources: "+resourceCount, "Humans: "+humanCount, "Zombies: "+zombieCount, "Sub-Humans: "+subhumanCount,
+                            "Mobs: "+mobCount, "Plant: "+plantCount, "Corpse: "+corpseCount};
+        MainView.setCount(amountArr);
+    }
+
+    public void dayWeather() {
+        MainView.setDayWeather(isDay, isRain, isLightning);
     }
 }

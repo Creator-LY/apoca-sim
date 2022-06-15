@@ -7,10 +7,12 @@ public class SubHuman extends Specie {
 
     public SubHuman(double x, double y, double worldWidth, double worldHeight, int diameter) {
         super(x, y, worldWidth, worldHeight, diameter);
+        setSpeed(2.2f);
     }
 
     public SubHuman(double worldWidth, double worldHeight, int diameter) {
         super(worldWidth, worldHeight, diameter);
+        setSpeed(2.2f);
     }
 
     public int getSpotRadius() {
@@ -50,7 +52,10 @@ public class SubHuman extends Specie {
         if (energy > 0) {
             super.move();
             deEnergy();
-        } 
+        } else {
+            super.move();
+            starveCount++;
+        }
     }
 
     public void setDefault(double x, double y) {

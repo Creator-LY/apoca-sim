@@ -7,12 +7,12 @@ public class Zombie extends Specie {
     
     public Zombie(double x, double y, double worldWidth, double worldHeight, int diameter) {
         super(x, y, worldWidth, worldHeight, diameter);
-        setSpeed(2.2f);
+        setSpeed(2.0f);
     }
 
     public Zombie(double worldWidth, double worldHeight, int diameter) {
         super(worldWidth, worldHeight, diameter);
-        setSpeed(2.2f);
+        setSpeed(2.0f);
     }
 
     public int getSpotRadius() {

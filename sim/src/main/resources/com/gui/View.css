@@ -28,9 +28,13 @@
     -fx-border-color: #4169e1;
     -fx-border-width: 0 0 3 0;
 }
-.status-label {
+.status > .label {
     -fx-text-fill: white;
     -fx-padding: 3 0 0 20;
+}
+.button-label {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
 }
 .border-bottom {
     -fx-border-color: #4169e1;
@@ -61,4 +65,30 @@
 #slider .axis {
     -fx-tick-label-fill: white;
 }
+#grid-numeric {
+    -fx-vgap: 10;
+    -fx-hgap: 3;
+}
+#grid-numeric > .label {
+    -fx-text-fill: white;
+}
+#grid-numeric > .text-field {
+    -fx-max-width: 45px;
+}
+#tools-title {
+    -fx-underline: true;
+    -fx-text-fill: white;
+    -fx-font-size: 1.2em;
+}
+.tool-bar {
+    -fx-background-color: #393940;
+}
+.tool-bar .button {
+    -fx-text-fill: white;
+    -fx-background-color:
+    rgb(5, 5, 5),
+    rgb(87, 89, 92),
+    linear-gradient(to bottom, rgb(74, 75, 78) 2%, rgb(39, 40, 40) 98%);
+}
+
 

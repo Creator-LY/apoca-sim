@@ -6,16 +6,17 @@ public class Plant extends Specie {
     private int energy;
     private double childX;
     private double childY;
+    private boolean onFire;
 
     public Plant(double x, double y, double worldWidth, double worldHeight, int diameter) {
         super(x, y, worldWidth, worldHeight, diameter);
-        setSpeed(3.5f);
+        setSpeed(5.0f);
         isRoot = false;
     }
 
     public Plant(double worldWidth, double worldHeight, int diameter, boolean isRoot) {
         super(worldWidth, worldHeight, diameter);
-        setSpeed(3.5f);
+        setSpeed(5.0f);
         this.isRoot = isRoot;
     }
 
@@ -36,8 +37,8 @@ public class Plant extends Specie {
     }
 
     public void extend() {
-        setChildX(getX()+getDx()*getSpeed());
-        setChildY(getY()+getDy()*getSpeed());
+        setChildX(getX()+getDx()*(getSpeed()+Math.random()*10));
+        setChildY(getY()+getDy()*(getSpeed()+Math.random()*10));
     }
 
     public void setRoot(boolean isRoot) {
@@ -58,11 +59,19 @@ public class Plant extends Specie {
 
     public boolean grow(boolean isDay) {
         if (!isDay) { return false; }
-        if (energy >= 100) {
-            energy -= 100;
+        if (energy >= 200) {
+            energy -= 200;
             return true;
         }
         return false;
+    }
+
+    public void setOnFire(boolean fire) {
+        onFire = fire;
+    }
+
+    public boolean getOnFire() {
+        return onFire;
     }
 
     public void setDefault(double x, double y) {

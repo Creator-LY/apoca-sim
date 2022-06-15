@@ -48,6 +48,10 @@ public class Human extends Specie {
     public int getSpotRadius() {
         return spotRadius;
     }
+
+    public int getEnergy() {
+        return energy;
+    }
     
     public void inEnergy(int amount) {
         if (starveCount == 0) {

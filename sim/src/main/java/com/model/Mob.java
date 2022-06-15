@@ -12,12 +12,12 @@ public class Mob extends Specie {
 
     public Mob(double x, double y, double worldWidth, double worldHeight, int diameter) {
         super(x, y, worldWidth, worldHeight, diameter);
-        setSpeed(2.4f);
+        setSpeed(1.5f);
     }
 
     public Mob(double worldWidth, double worldHeight, int diameter) {
         super(worldWidth, worldHeight, diameter);
-        setSpeed(2.4f);
+        setSpeed(1.5f);
     }
 
     public int getSpotRadius() {
@@ -61,7 +61,7 @@ public class Mob extends Specie {
     }
 
     public boolean giveBirth() {
-        return birthPeriod >= 200;
+        return birthPeriod >= 400;
     }
 
     public void inEnergy(int amount) {
