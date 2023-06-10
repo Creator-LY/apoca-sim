@@ -22,16 +22,17 @@ Apocalyptic Simulation allows you to observe and interact with various species r
 ## Simulation Info
 
 <img src="/demo/food-chain.png" width=340px /><img src="/demo/food-chain2.png" width=340px />
-<br/>
+:-
 <img src="/demo/pyramid.png" width=340px /><img src="/demo/c&s.png" width=340px />
 
 |**Human Behaviour Model**|**Sub-Human Behaviour Model**|**Zombie Behaviour Model**|
-|+ Move towards resource|+ Move towards resource or unmutated corpse|+ Move towards Nearest Human/Sub-Human|
-|+ Take resource|+ Take resource||
-|+ Become unmutated corpse|+ Become mutated corpse|+ Become mutated corpse|
-|+ Convert to zombie|+ Convert to zombie||
-|+ Convert to sub-human|+ Kill zombie on day|+ Kill Human or Sub-Human|
-|+ Breed with other humans|+ Eat Human on starvation|+ Eat corpse|
+| --- | --- | --- |
+| + Move towards resource | + Move towards resource or unmutated corpse | + Move towards Nearest Human/Sub-Human |
+| + Take resource | + Take resource | |
+| + Become unmutated corpse | + Become mutated corpse | + Become mutated corpse |
+| + Convert to zombie | + Convert to zombie | |
+| + Convert to sub-human | + Kill zombie on day | + Kill Human or Sub-Human |
+| + Breed with other humans | + Eat Human on starvation | + Eat corpse |
 
 <br/>
 
