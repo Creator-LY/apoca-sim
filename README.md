@@ -37,6 +37,7 @@ Apocalyptic Simulation allows you to observe and interact with various species r
 <br/>
 
 |**Mob Behaviour Model**|**Plant Behaviour Model**|**Resource Behaviour Model**|
+| --- | --- | --- |
 |+ Move towards plant before anything else|+ Grow|+ Spawn over time base on population|
 |+ Become corpse|+ Try Kill species on touch||
 |+ Eat corpse|||
@@ -46,13 +47,15 @@ Apocalyptic Simulation allows you to observe and interact with various species r
 <br/>
 
 |**Day Effect**|**Night Effect**|**Rain Effect**|
-|+ Plant growth|+ Zombie can kill Sub-Human|+ Plant gains strength and energy|
-|+ Sub-Human gain ability to kill zombie|+ Plant lose strength|+ Put out fire|
+| --- | --- | --- |
+| + Plant growth|+ Zombie can kill Sub-Human|+ Plant gains strength and energy|
+| + Sub-Human gain ability to kill zombie|+ Plant lose strength|+ Put out fire|
 
 
 |**Lightning Effect**|
-|+ Cause death to random unlucky victim|
-|+ Cause fire event on plant|
+| --- |
+| + Cause death to random unlucky victim |
+| + Cause fire event on plant |
 
 ## Guidelines to setup
 
